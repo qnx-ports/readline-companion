@@ -1,0 +1,54 @@
+pkgname=readline
+_basever=8.3
+_patchlevel=001
+pkgver=$_basever.$_patchlevel
+pkgrel=1
+pkgdesc="GNU readline library"
+url="https://tiswww.case.edu/php/chet/readline/rltop.html"
+arch="all"
+options="!check"
+license="GPL-3.0-or-later"
+depends="ncurses"
+# qnx-io-sock-dev is only needed for header not runtime
+makedepends="ncurses-dev qnx-io-sock-dev"
+#makedepends_host="chrpath"
+subpackages="$pkgname-static $pkgname-dev $pkgname-doc"
+source="https://mirror.csclub.uwaterloo.ca/gnu/readline/readline-$_basever.tar.gz
+    inputrc
+    fix-qnx.patch
+"
+patch_args="-p0" # patchlevel used by upstream patches
+
+_i=1
+while [ $_i -le ${pkgver##*.} ]; do
+    _patch=$(printf "%03d" $_i)
+    _name=$pkgname${_basever//./}-$_patch
+    source="$source
+        $_name.patch::https://mirror.csclub.uwaterloo.ca/gnu/readline/readline-$_basever-patches/$_name"
+    _i=$((_i+1))
+done
+
+builddir="$srcdir/$pkgname-$_basever"
+
+build() {
+    ./configure \
+        --build=$CBUILD \
+        --host=$CHOST \
+        --prefix=/usr \
+        --mandir=/usr/share/man \
+        --enable-static \
+        --enable-shared
+    make SHLIB_LIBS=-lncurses
+}
+
+package() {
+    make -C "$builddir" DESTDIR="$pkgdir" install
+    install -Dm644 "$srcdir"/inputrc "$pkgdir"/etc/inputrc
+}
+
+sha512sums="
+513002753dcf5db9213dbbb61d51217245f6a40d33b1dd45238e8062dfa8eef0c890b87a5548e11db959e842724fb572c4d3d7fb433773762a63c30efe808344  readline-8.3.tar.gz
+41e7748abdf218426783d50caafd82bc8e82d7298f68c8f4322db021aa0f2893b3e38dcd6a26ad827d13091c1d44097896f0535c9c5a4ae418edfed830618a9a  inputrc
+ef26384748ef58573055a253a3b6864b2be7bd140fa6d45e0b912911ed57d1be76e061e490dc9e14d5bb7f906bb873382601863724b22ffc628d1f457cfee390  fix-qnx.patch
+ced50af353ed527f6ec0eac5f65261f2ed208825ec72fe2acf5f0217f34f84f33dcbf01b895325f6b33664b5a426bac99506193e2ddb6eea8c79ccad37364b89  readline83-001.patch
+"
