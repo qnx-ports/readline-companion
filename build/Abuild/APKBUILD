@@ -2,7 +2,7 @@ pkgname=readline
 _basever=8.3
 _patchlevel=001
 pkgver=$_basever.$_patchlevel
-pkgrel=${pkgrel:-0}
+pkgrel=1
 pkgdesc="GNU readline library"
 url="https://tiswww.case.edu/php/chet/readline/rltop.html"
 arch="all"
@@ -46,7 +46,6 @@ package() {
     install -Dm644 "$srcdir"/inputrc "$pkgdir"/etc/inputrc
 }
 
-options="$options ${DISABLE_CHECK:+!check}"
 sha512sums="
 513002753dcf5db9213dbbb61d51217245f6a40d33b1dd45238e8062dfa8eef0c890b87a5548e11db959e842724fb572c4d3d7fb433773762a63c30efe808344  readline-8.3.tar.gz
 41e7748abdf218426783d50caafd82bc8e82d7298f68c8f4322db021aa0f2893b3e38dcd6a26ad827d13091c1d44097896f0535c9c5a4ae418edfed830618a9a  inputrc
